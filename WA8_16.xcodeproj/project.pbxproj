@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -32,6 +32,8 @@
 		4B99E0792A2AD3C400561156 /* RegisterProgressIndicatorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0782A2AD3C400561156 /* RegisterProgressIndicatorManager.swift */; };
 		4B99E07D2A2AEAF100561156 /* AddContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E07C2A2AEAF100561156 /* AddContactView.swift */; };
 		4B99E07F2A2AEB0A00561156 /* AddContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E07E2A2AEB0A00561156 /* AddContactViewController.swift */; };
+		CA0573EA2EB95EBE001DF159 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0573E92EB95EBA001DF159 /* UserModel.swift */; };
+		CA0573EC2EB964B5001DF159 /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA0573EB2EB964AE001DF159 /* MessageModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,7 +60,13 @@
 		4B99E0782A2AD3C400561156 /* RegisterProgressIndicatorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterProgressIndicatorManager.swift; sourceTree = "<group>"; };
 		4B99E07C2A2AEAF100561156 /* AddContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactView.swift; sourceTree = "<group>"; };
 		4B99E07E2A2AEB0A00561156 /* AddContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactViewController.swift; sourceTree = "<group>"; };
+		CA0573E92EB95EBA001DF159 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
+		CA0573EB2EB964AE001DF159 /* MessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CA0573E52EB9588B001DF159 /* API */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = API; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		4B91D9472A298B5200070ED2 /* Frameworks */ = {
@@ -94,6 +102,7 @@
 		4B91D94C2A298B5200070ED2 /* App12 */ = {
 			isa = PBXGroup;
 			children = (
+				CA0573E52EB9588B001DF159 /* API */,
 				4B99E0622A2A735600561156 /* Configs.swift */,
 				4B99E0642A2A779600561156 /* Data Models */,
 				4B99E0732A2ACD6900561156 /* Progress Indicator */,
@@ -134,6 +143,8 @@
 		4B99E0642A2A779600561156 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
+				CA0573EB2EB964AE001DF159 /* MessageModel.swift */,
+				CA0573E92EB95EBA001DF159 /* UserModel.swift */,
 				4B99E0652A2A77AA00561156 /* Contact.swift */,
 			);
 			path = "Data Models";
@@ -198,6 +209,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CA0573E52EB9588B001DF159 /* API */,
 			);
 			name = WA8_16;
 			packageProductDependencies = (
@@ -280,6 +294,8 @@
 				4B99E0632A2A735600561156 /* Configs.swift in Sources */,
 				4B99E0682A2A795600561156 /* ContactsTableViewManager.swift in Sources */,
 				4B99E0662A2A77AA00561156 /* Contact.swift in Sources */,
+				CA0573EC2EB964B5001DF159 /* MessageModel.swift in Sources */,
+				CA0573EA2EB95EBE001DF159 /* UserModel.swift in Sources */,
 				4B99E0772A2ACD8A00561156 /* ProgressSpinnerDelegate.swift in Sources */,
 				4B99E07D2A2AEAF100561156 /* AddContactView.swift in Sources */,
 			);

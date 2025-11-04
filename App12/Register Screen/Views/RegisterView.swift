@@ -11,6 +11,7 @@ class RegisterView: UIView {
     var textFieldName: UITextField!
     var textFieldEmail: UITextField!
     var textFieldPassword: UITextField!
+    var textFieldReenterPassword: UITextField!
     var buttonRegister: UIButton!
     
     override init(frame: CGRect){
@@ -19,6 +20,7 @@ class RegisterView: UIView {
         setuptextFieldName()
         setuptextFieldEmail()
         setuptextFieldPassword()
+        setuptextFieldReenterPassword()
         setupbuttonRegister()
         
         initConstraints()
@@ -52,6 +54,16 @@ class RegisterView: UIView {
         self.addSubview(textFieldPassword)
     }
     
+    func setuptextFieldReenterPassword() {
+        textFieldReenterPassword = UITextField()
+        textFieldReenterPassword.placeholder = "Re-enter Password"
+        textFieldReenterPassword.textContentType = .password
+        textFieldReenterPassword.isSecureTextEntry = true
+        textFieldReenterPassword.borderStyle = .roundedRect
+        textFieldReenterPassword.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(textFieldReenterPassword)
+    }
+    
     func setupbuttonRegister(){
         buttonRegister = UIButton(type: .system)
         buttonRegister.setTitle("Register", for: .normal)
@@ -74,7 +86,11 @@ class RegisterView: UIView {
             textFieldPassword.centerXAnchor.constraint(equalTo: self.safeAreaLayoutGuide.centerXAnchor),
             textFieldPassword.widthAnchor.constraint(equalTo: self.safeAreaLayoutGuide.widthAnchor, multiplier: 0.9),
             
-            buttonRegister.topAnchor.constraint(equalTo: textFieldPassword.bottomAnchor, constant: 32),
+            textFieldReenterPassword.topAnchor.constraint(equalTo: textFieldPassword.bottomAnchor, constant: 16),
+            textFieldReenterPassword.centerXAnchor.constraint(equalTo: self.safeAreaLayoutGuide.centerXAnchor),
+            textFieldReenterPassword.widthAnchor.constraint(equalTo: self.safeAreaLayoutGuide.widthAnchor, multiplier: 0.9),
+            
+            buttonRegister.topAnchor.constraint(equalTo: textFieldReenterPassword.bottomAnchor, constant: 32),
             buttonRegister.centerXAnchor.constraint(equalTo: self.safeAreaLayoutGuide.centerXAnchor),
         ])
     }

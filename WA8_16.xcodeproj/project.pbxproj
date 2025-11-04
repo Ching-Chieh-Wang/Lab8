@@ -86,7 +86,7 @@
 		4B91D9412A298B5200070ED2 = {
 			isa = PBXGroup;
 			children = (
-				4B91D94C2A298B5200070ED2 /* App12 */,
+				4B91D94C2A298B5200070ED2 /* WA8_16 */,
 				4B91D94B2A298B5200070ED2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,7 +99,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		4B91D94C2A298B5200070ED2 /* App12 */ = {
+		4B91D94C2A298B5200070ED2 /* WA8_16 */ = {
 			isa = PBXGroup;
 			children = (
 				CA0573E52EB9588B001DF159 /* API */,
@@ -117,7 +117,7 @@
 				4B91D95B2A298B5400070ED2 /* Info.plist */,
 				4B91D9612A298C3D00070ED2 /* GoogleService-Info.plist */,
 			);
-			path = App12;
+			path = WA8_16;
 			sourceTree = "<group>";
 		};
 		4B99E05C2A2A6EBE00561156 /* Main Screen  */ = {

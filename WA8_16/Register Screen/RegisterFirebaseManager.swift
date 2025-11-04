@@ -67,10 +67,15 @@ extension RegisterViewController{
                         }
                     }
                 } else {
-                    //MARK: there is a error creating the user...
-                    print(error)
+                    //MARK: there is an error creating the user...
+                    if let error = error {
+                        self.showAlert(title: "Registration Failed", message: error.localizedDescription)
+                    }
+                    
                 }
             })
+            
+            self.hideActivityIndicator()
         }
     }
     

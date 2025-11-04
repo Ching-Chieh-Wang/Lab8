@@ -19,10 +19,10 @@
 		4B91D9692A298D0100070ED2 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4B91D9682A298D0100070ED2 /* FirebaseFirestoreSwift */; };
 		4B91D96B2A298D0100070ED2 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 4B91D96A2A298D0100070ED2 /* FirebaseStorage */; };
 		4B99E05F2A2A6EE700561156 /* MainScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E05E2A2A6EE700561156 /* MainScreenView.swift */; };
-		4B99E0612A2A723300561156 /* ChatListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0602A2A723300561156 /* ChatListCell.swift */; };
+		4B99E0612A2A723300561156 /* ContactsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0602A2A723300561156 /* ContactsTableViewCell.swift */; };
 		4B99E0632A2A735600561156 /* Configs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0622A2A735600561156 /* Configs.swift */; };
 		4B99E0662A2A77AA00561156 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0652A2A77AA00561156 /* Contact.swift */; };
-		4B99E0682A2A795600561156 /* ChatsTableViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0672A2A795600561156 /* ChatsTableViewManager.swift */; };
+		4B99E0682A2A795600561156 /* ContactsTableViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0672A2A795600561156 /* ContactsTableViewManager.swift */; };
 		4B99E06A2A2A89FA00561156 /* RightBarButtonManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E0692A2A89FA00561156 /* RightBarButtonManager.swift */; };
 		4B99E06E2A2A9CA700561156 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E06D2A2A9CA700561156 /* RegisterView.swift */; };
 		4B99E0702A2A9E5800561156 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B99E06F2A2A9E5800561156 /* RegisterViewController.swift */; };
@@ -47,10 +47,10 @@
 		4B91D95B2A298B5400070ED2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B91D9612A298C3D00070ED2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4B99E05E2A2A6EE700561156 /* MainScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenView.swift; sourceTree = "<group>"; };
-		4B99E0602A2A723300561156 /* ChatListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListCell.swift; sourceTree = "<group>"; };
+		4B99E0602A2A723300561156 /* ContactsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsTableViewCell.swift; sourceTree = "<group>"; };
 		4B99E0622A2A735600561156 /* Configs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configs.swift; sourceTree = "<group>"; };
 		4B99E0652A2A77AA00561156 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
-		4B99E0672A2A795600561156 /* ChatsTableViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsTableViewManager.swift; sourceTree = "<group>"; };
+		4B99E0672A2A795600561156 /* ContactsTableViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsTableViewManager.swift; sourceTree = "<group>"; };
 		4B99E0692A2A89FA00561156 /* RightBarButtonManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightBarButtonManager.swift; sourceTree = "<group>"; };
 		4B99E06D2A2A9CA700561156 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		4B99E06F2A2A9E5800561156 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
@@ -65,7 +65,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		78D8C78F2EB9A8D200418818 /* ChatScreen */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ChatScreen; sourceTree = "<group>"; };
 		CA0573E52EB9588B001DF159 /* API */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = API; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -103,7 +102,6 @@
 		4B91D94C2A298B5200070ED2 /* WA8_16 */ = {
 			isa = PBXGroup;
 			children = (
-				78D8C78F2EB9A8D200418818 /* ChatScreen */,
 				CA0573E52EB9588B001DF159 /* API */,
 				4B99E0622A2A735600561156 /* Configs.swift */,
 				4B99E0642A2A779600561156 /* Data Models */,
@@ -127,7 +125,7 @@
 			children = (
 				4B99E05D2A2A6EC700561156 /* Views */,
 				4B91D9512A298B5200070ED2 /* ViewController.swift */,
-				4B99E0672A2A795600561156 /* ChatsTableViewManager.swift */,
+				4B99E0672A2A795600561156 /* ContactsTableViewManager.swift */,
 				4B99E0692A2A89FA00561156 /* RightBarButtonManager.swift */,
 			);
 			path = "Main Screen ";
@@ -137,7 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				4B99E05E2A2A6EE700561156 /* MainScreenView.swift */,
-				4B99E0602A2A723300561156 /* ChatListCell.swift */,
+				4B99E0602A2A723300561156 /* ContactsTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -213,7 +211,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				78D8C78F2EB9A8D200418818 /* ChatScreen */,
 				CA0573E52EB9588B001DF159 /* API */,
 			);
 			name = WA8_16;
@@ -287,7 +284,7 @@
 				4B99E0702A2A9E5800561156 /* RegisterViewController.swift in Sources */,
 				4B99E06E2A2A9CA700561156 /* RegisterView.swift in Sources */,
 				4B91D94E2A298B5200070ED2 /* AppDelegate.swift in Sources */,
-				4B99E0612A2A723300561156 /* ChatListCell.swift in Sources */,
+				4B99E0612A2A723300561156 /* ContactsTableViewCell.swift in Sources */,
 				4B99E0752A2ACD7B00561156 /* ProgressSpinnerViewController.swift in Sources */,
 				4B99E06A2A2A89FA00561156 /* RightBarButtonManager.swift in Sources */,
 				4B99E07F2A2AEB0A00561156 /* AddContactViewController.swift in Sources */,
@@ -295,7 +292,7 @@
 				4B99E05F2A2A6EE700561156 /* MainScreenView.swift in Sources */,
 				4B99E0792A2AD3C400561156 /* RegisterProgressIndicatorManager.swift in Sources */,
 				4B99E0632A2A735600561156 /* Configs.swift in Sources */,
-				4B99E0682A2A795600561156 /* ChatsTableViewManager.swift in Sources */,
+				4B99E0682A2A795600561156 /* ContactsTableViewManager.swift in Sources */,
 				4B99E0662A2A77AA00561156 /* Contact.swift in Sources */,
 				CA0573EC2EB964B5001DF159 /* MessageModel.swift in Sources */,
 				CA0573EA2EB95EBE001DF159 /* UserModel.swift in Sources */,

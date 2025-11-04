@@ -11,6 +11,12 @@ import FirebaseFirestore
 
 extension RegisterViewController{
     
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        self.present(alert, animated: true)
+    }
+    
     func registerNewAccount(){
         //MARK: display the progress indicator...
         showActivityIndicator()
@@ -19,9 +25,27 @@ extension RegisterViewController{
            let email = registerView.textFieldEmail.text,
            let password = registerView.textFieldPassword.text,
            let reenterPassword = registerView.textFieldReenterPassword.text {
-
+            
+            guard !name.isEmpty, !email.isEmpty, !password.isEmpty, !reenterPassword.isEmpty else {
+                showAlert(title: "Error", message: "All fields are required.")
+                self.hideActivityIndicator()
+                return
+            }
+            
+            guard email.contains("@"), email.contains(".") else {
+                showAlert(title: "Error", message: "Invalid email format.")
+                self.hideActivityIndicator()
+                return
+            }
+            
+            guard password.count >= 6 else {
+                showAlert(title: "Error", message: "Password must be at least 6 characters.")
+                self.hideActivityIndicator()
+                return
+            }
+            
             guard password == reenterPassword else {
-                print("Passwords do not match.")
+                showAlert(title: "Error", message: "Passwords do not match.")
                 self.hideActivityIndicator()
                 return
             }
@@ -43,10 +67,15 @@ extension RegisterViewController{
                         }
                     }
                 } else {
-                    //MARK: there is a error creating the user...
-                    print(error)
+                    //MARK: there is an error creating the user...
+                    if let error = error {
+                        self.showAlert(title: "Registration Failed", message: error.localizedDescription)
+                    }
+                    
                 }
             })
+            
+            self.hideActivityIndicator()
         }
     }
     

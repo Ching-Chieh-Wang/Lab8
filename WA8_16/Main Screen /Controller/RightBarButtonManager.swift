@@ -115,18 +115,35 @@ extension ViewController{
     }
     
     func signInToFirebase(email: String, password: String){
-        //MARK: can you display progress indicator here?
-        //MARK: authenticating the user...
-        Auth.auth().signIn(withEmail: email, password: password, completion: {(result, error) in
-            if error == nil{
-                //MARK: user authenticated...
-                //MARK: can you hide the progress indicator here?
-            }else{
-                //MARK: alert that no user found or password wrong...
+        // Show progress indicator
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.center = self.view.center
+        spinner.startAnimating()
+        self.view.addSubview(spinner)
+
+        Auth.auth().signIn(withEmail: email, password: password) { result, error in
+            // Hide progress indicator
+            DispatchQueue.main.async {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
             }
-            
-        })
+
+            if let error = error {
+                // Show error alert
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(title: "Login Failed", message: error.localizedDescription, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                }
+            } else {
+                // Successful login
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(title: "Login Successful", message: "Welcome \(result?.user.email ?? "")!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                }
+            }
+        }
     }
     
 }
-

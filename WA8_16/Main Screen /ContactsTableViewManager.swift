@@ -8,16 +8,16 @@
 import Foundation
 import UIKit
 
-extension ViewController: UITableViewDelegate, UITableViewDataSource{
+extension ViewController {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return contactsList.count
+        return usersList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Configs.tableViewContactsID, for: indexPath) as! ContactsTableViewCell
-        cell.labelName.text = contactsList[indexPath.row].name
-        cell.labelEmail.text = contactsList[indexPath.row].email
-        cell.labelPhone.text = "\(contactsList[indexPath.row].phone)"
+        let cell = tableView.dequeueReusableCell(withIdentifier: Configs.tableViewChatListID, for: indexPath) as! ChatListCell
+        cell.labelName.text = usersList[indexPath.row].name
+        cell.labelLastMessage.text = usersList[indexPath.row].email
+        cell.labelTime.text = ""
         return cell
     }
 }

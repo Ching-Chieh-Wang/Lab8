@@ -10,8 +10,8 @@ import UIKit
 class MainScreenView: UIView {
     var profilePic: UIImageView!
     var labelText: UILabel!
-    var floatingButtonAddContact: UIButton!
-    var tableViewContacts: UITableView!
+    var buttonNewChat: UIButton!
+    var tableViewChats: UITableView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -19,8 +19,8 @@ class MainScreenView: UIView {
         
         setupProfilePic()
         setupLabelText()
-        setupFloatingButtonAddContact()
-        setupTableViewContacts()
+        setupButtonNewChat()
+        setupTableViewChats()
         initConstraints()
     }
     
@@ -42,27 +42,33 @@ class MainScreenView: UIView {
         self.addSubview(labelText)
     }
     
-    func setupTableViewContacts(){
-        tableViewContacts = UITableView()
-        tableViewContacts.register(ContactsTableViewCell.self, forCellReuseIdentifier: Configs.tableViewContactsID)
-        tableViewContacts.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(tableViewContacts)
+    func setupTableViewChats(){
+        tableViewChats = UITableView(frame: .zero, style: .plain)
+        tableViewChats.backgroundColor = UIColor.systemGray6
+        tableViewChats.separatorStyle = .none
+        tableViewChats.rowHeight = 72
+        tableViewChats.showsVerticalScrollIndicator = false
+        tableViewChats.layer.cornerRadius = 8
+        tableViewChats.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
+        tableViewChats.register(ChatListCell.self, forCellReuseIdentifier: Configs.tableViewChatListID)
+        tableViewChats.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(tableViewChats)
     }
     
-    func setupFloatingButtonAddContact(){
-        floatingButtonAddContact = UIButton(type: .system)
-        floatingButtonAddContact.setTitle("", for: .normal)
-        floatingButtonAddContact.setImage(UIImage(systemName: "person.crop.circle.fill.badge.plus")?.withRenderingMode(.alwaysOriginal), for: .normal)
-        floatingButtonAddContact.contentHorizontalAlignment = .fill
-        floatingButtonAddContact.contentVerticalAlignment = .fill
-        floatingButtonAddContact.imageView?.contentMode = .scaleAspectFit
-        floatingButtonAddContact.layer.cornerRadius = 16
-        floatingButtonAddContact.imageView?.layer.shadowOffset = .zero
-        floatingButtonAddContact.imageView?.layer.shadowRadius = 0.8
-        floatingButtonAddContact.imageView?.layer.shadowOpacity = 0.7
-        floatingButtonAddContact.imageView?.clipsToBounds = true
-        floatingButtonAddContact.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(floatingButtonAddContact)
+    func setupButtonNewChat(){
+        buttonNewChat = UIButton(type: .system)
+        buttonNewChat.setTitle("", for: .normal)
+        buttonNewChat.setImage(UIImage(systemName: "plus.bubble.fill")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        buttonNewChat.contentHorizontalAlignment = .fill
+        buttonNewChat.contentVerticalAlignment = .fill
+        buttonNewChat.imageView?.contentMode = .scaleAspectFit
+        buttonNewChat.layer.cornerRadius = 16
+        buttonNewChat.imageView?.layer.shadowOffset = .zero
+        buttonNewChat.imageView?.layer.shadowRadius = 0.8
+        buttonNewChat.imageView?.layer.shadowOpacity = 0.7
+        buttonNewChat.imageView?.clipsToBounds = true
+        buttonNewChat.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(buttonNewChat)
     }
     
     
@@ -78,15 +84,15 @@ class MainScreenView: UIView {
             labelText.bottomAnchor.constraint(equalTo: profilePic.bottomAnchor),
             labelText.leadingAnchor.constraint(equalTo: profilePic.trailingAnchor, constant: 8),
             
-            tableViewContacts.topAnchor.constraint(equalTo: profilePic.bottomAnchor, constant: 8),
-            tableViewContacts.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -8),
-            tableViewContacts.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            tableViewContacts.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            tableViewChats.topAnchor.constraint(equalTo: profilePic.bottomAnchor, constant: 8),
+            tableViewChats.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -8),
+            tableViewChats.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            tableViewChats.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             
-            floatingButtonAddContact.widthAnchor.constraint(equalToConstant: 48),
-            floatingButtonAddContact.heightAnchor.constraint(equalToConstant: 48),
-            floatingButtonAddContact.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            floatingButtonAddContact.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            buttonNewChat.widthAnchor.constraint(equalToConstant: 48),
+            buttonNewChat.heightAnchor.constraint(equalToConstant: 48),
+            buttonNewChat.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            buttonNewChat.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             
         ])
     }

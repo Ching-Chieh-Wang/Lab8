@@ -8,7 +8,7 @@
 
 import UIKit
 import FirebaseAuth
-import FirebaseFirestore   // for Timestamp.dateValue()
+import FirebaseFirestore
 
 final class ChatViewController: UIViewController {
 
@@ -16,27 +16,37 @@ final class ChatViewController: UIViewController {
     private let friend: UserModel
     private let currentUser: FirebaseAuth.User
 
-    // MARK: - Data
+    // MARK: - Data / API
     private let api = MessageAPI()
     private var messages: [MessageModel] = []
+    private var liveListener: ListenerRegistration?
+
+    // Pagination
+    private var isLoadingMore = false
+    private var hasMore = true
+    private var oldestLoadedTimestamp: Timestamp?
+
+    // User interaction flags
+    private var userIsInteracting = false
+    private var didDoInitialScroll = false
 
     // MARK: - UI
     private let tableView = UITableView(frame: .zero, style: .plain)
+    private let refresh = UIRefreshControl()
+
     private let inputContainer = UIView()
     private let inputTextView = UITextView()
     private let sendButton = UIButton(type: .system)
 
-    // Constraints we’ll adjust
     private var inputBottomConstraint: NSLayoutConstraint!
     private var inputTextViewHeight: NSLayoutConstraint!
 
     // MARK: - Time formatters
     private lazy var relativeFmt: RelativeDateTimeFormatter = {
         let f = RelativeDateTimeFormatter()
-        f.unitsStyle = .full   // .short -> "5 min ago"; .full -> "5 minutes ago"
+        f.unitsStyle = .full
         return f
     }()
-
     private lazy var absoluteFmt: DateFormatter = {
         let f = DateFormatter()
         f.locale = .current
@@ -44,9 +54,6 @@ final class ChatViewController: UIViewController {
         f.timeStyle = .short
         return f
     }()
-
-    /// Popular UX: relative for recent (“5 minutes ago”), “yesterday” for 1 day,
-    /// then absolute date+time after 7 days.
     private func prettyTimestamp(for date: Date, now: Date = Date()) -> String {
         if Calendar.current.isDateInYesterday(date) { return "yesterday" }
         let days = Calendar.current.dateComponents([.day], from: date, to: now).day ?? 0
@@ -70,25 +77,45 @@ final class ChatViewController: UIViewController {
         setupTable()
         setupInputArea()
         registerKeyboardObservers()
-        startListening()
+        startLiveTail()
         updateSendState()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateTableInsets()
+        // Do an initial bottom scroll exactly once if content exists
+        if !didDoInitialScroll, messages.count > 0 {
+            didDoInitialScroll = true
+            DispatchQueue.main.async { [weak self] in self?.scrollToBottom(animated: false) }
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        liveListener?.remove()
+        liveListener = nil
     }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+        liveListener?.remove()
     }
 
-    // MARK: - UI Setup
+    // MARK: - UI setup
     private func setupTable() {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
         tableView.alwaysBounceVertical = true
         tableView.keyboardDismissMode = .interactive
-        tableView.contentInset.bottom = 6
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(MessageCell.self, forCellReuseIdentifier: MessageCell.reuseID)
         view.addSubview(tableView)
+
+        // Pull to load older messages
+        refresh.addTarget(self, action: #selector(loadOlderPage), for: .valueChanged)
+        tableView.refreshControl = refresh
 
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -102,7 +129,6 @@ final class ChatViewController: UIViewController {
         inputContainer.backgroundColor = .secondarySystemBackground
         view.addSubview(inputContainer)
 
-        // Larger multi-line chat box above the Send button
         inputTextView.translatesAutoresizingMaskIntoConstraints = false
         inputTextView.font = .systemFont(ofSize: 16)
         inputTextView.isScrollEnabled = false
@@ -112,17 +138,13 @@ final class ChatViewController: UIViewController {
         inputTextView.delegate = self
         inputContainer.addSubview(inputTextView)
 
-        // Send button below the box
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         sendButton.setTitle("Send", for: .normal)
         sendButton.titleLabel?.font = .boldSystemFont(ofSize: 17)
         sendButton.addTarget(self, action: #selector(onSendTapped), for: .touchUpInside)
         inputContainer.addSubview(sendButton)
 
-        // Bottom attachment
         inputBottomConstraint = inputContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-
-        // Height of the text view (auto-growing 56...120)
         inputTextViewHeight = inputTextView.heightAnchor.constraint(greaterThanOrEqualToConstant: 56)
 
         NSLayoutConstraint.activate([
@@ -143,7 +165,26 @@ final class ChatViewController: UIViewController {
         ])
     }
 
-    // MARK: - Keyboard handling
+    // MARK: - Insets to keep last message visible
+    private func updateTableInsets() {
+        inputContainer.layoutIfNeeded()
+        let barHeight = inputContainer.bounds.height
+        let bottomInset = barHeight + 12
+        tableView.contentInset.bottom = bottomInset
+        tableView.scrollIndicatorInsets.bottom = bottomInset
+    }
+
+    // Are we close enough to the bottom to auto-stick?
+    private func isNearBottom(threshold: CGFloat = 60) -> Bool {
+        tableView.layoutIfNeeded()
+        let contentH = tableView.contentSize.height
+        if contentH <= 0 { return true }
+        let visibleH = tableView.bounds.height
+        let bottomY = contentH + tableView.contentInset.bottom - visibleH
+        return tableView.contentOffset.y >= bottomY - threshold
+    }
+
+    // MARK: - Keyboard
     private func registerKeyboardObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(onKeyboard(notification:)),
                                                name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
@@ -161,6 +202,7 @@ final class ChatViewController: UIViewController {
         let isHiding = notification.name == UIResponder.keyboardWillHideNotification
         let kbHeight = isHiding ? 0 : max(0, view.convert(endFrame, from: nil).intersection(view.bounds).height)
 
+        let shouldStick = isNearBottom() // capture BEFORE layout change
         inputBottomConstraint.constant = -kbHeight
 
         UIView.animate(withDuration: duration,
@@ -168,26 +210,103 @@ final class ChatViewController: UIViewController {
                        options: UIView.AnimationOptions(rawValue: curveRaw << 16),
                        animations: {
                            self.view.layoutIfNeeded()
-                           if !self.messages.isEmpty { self.scrollToBottom(animated: false) }
+                           self.updateTableInsets()
+                           // only autoscroll if user was near bottom
+                           if shouldStick, !self.messages.isEmpty {
+                               self.scrollToBottom(animated: false)
+                           }
                        },
                        completion: nil)
     }
 
-    // MARK: - Messaging
-    private func startListening() {
-        api.listenForMessages(between: currentUser.uid, and: friend.id) { [weak self] newMessages, error in
+    // MARK: - Live tail
+    private func startLiveTail(limit: Int = 30) {
+        liveListener?.remove()
+        liveListener = api.listenForLatestMessages(between: currentUser.uid, and: friend.id, limit: limit) { [weak self] latest, error in
             guard let self = self else { return }
             if let error = error {
                 print("listen error:", error)
                 return
             }
-            let msgs = newMessages ?? []
-            self.messages = msgs.sorted { $0.timestamp.dateValue() < $1.timestamp.dateValue() }
+            let tail = latest ?? []
+
+            // Capture stickiness BEFORE we mutate data
+            let shouldStick = self.isNearBottom()
+
+            // Merge: keep already-loaded older pages (< first tail timestamp),
+            // then append the latest tail; de-dupe by id.
+            let olderPart: [MessageModel]
+            if let firstTail = tail.first?.timestamp.dateValue() {
+                olderPart = self.messages.filter { $0.timestamp.dateValue() < firstTail }
+            } else {
+                olderPart = []
+            }
+            let tailIds = Set(tail.map { $0.id })
+            let keptOlder = olderPart.filter { !tailIds.contains($0.id) }
+
+            var merged = keptOlder + tail
+            var seen = Set<String>()
+            merged = merged.filter { seen.insert($0.id).inserted }
+
+            self.messages = merged
+            self.oldestLoadedTimestamp = self.messages.first?.timestamp
+            self.hasMore = (self.oldestLoadedTimestamp != nil)
+
             self.tableView.reloadData()
-            self.scrollToBottom(animated: false)
+            self.updateTableInsets()
+
+            // Only snap to bottom if user was already near bottom (or we haven't scrolled yet)
+            if (shouldStick || !self.didDoInitialScroll), !self.messages.isEmpty {
+                self.scrollToBottom(animated: false)
+                self.didDoInitialScroll = true
+            }
         }
     }
 
+    // MARK: - Pagination (pull to refresh)
+    @objc private func loadOlderPage() {
+        guard !isLoadingMore, hasMore, let cursor = oldestLoadedTimestamp else {
+            refresh.endRefreshing()
+            return
+        }
+        isLoadingMore = true
+
+        let beforeHeight = tableView.contentSize.height
+
+        api.fetchOlderMessages(between: currentUser.uid, and: friend.id, before: cursor, limit: 30) { [weak self] chunk, error in
+            guard let self = self else { return }
+            self.refresh.endRefreshing()
+            self.isLoadingMore = false
+
+            if let error = error {
+                print("older fetch error:", error)
+                return
+            }
+            let older = chunk ?? []
+            if older.isEmpty {
+                self.hasMore = false
+                return
+            }
+
+            // Prepend, de-dupe by id
+            var seen = Set(self.messages.map { $0.id })
+            let uniques = older.filter { seen.insert($0.id).inserted }
+            self.messages.insert(contentsOf: uniques, at: 0)
+            self.oldestLoadedTimestamp = self.messages.first?.timestamp
+
+            self.tableView.reloadData()
+            self.tableView.layoutIfNeeded()
+
+            // Preserve current viewport (no jump to bottom during pagination)
+            let afterHeight = self.tableView.contentSize.height
+            let delta = afterHeight - beforeHeight
+            self.tableView.contentOffset.y += delta
+
+            self.updateTableInsets()
+        }
+    }
+
+    // MARK: - Send
     @objc private func onSendTapped() { sendCurrentText() }
 
     private func sendCurrentText() {
@@ -195,14 +314,26 @@ final class ChatViewController: UIViewController {
         guard !text.isEmpty else { return }
 
         let senderName = currentUser.displayName ?? "Me"
+        sendButton.isEnabled = false
         api.sendMessage(from: currentUser.uid, to: friend.id, text: text, senderName: senderName) { [weak self] error in
-            if let error = error { print("send error:", error) }
-            self?.inputTextView.text = ""
-            self?.resizeTextViewIfNeeded()
-            self?.updateSendState()
+            guard let self = self else { return }
+            self.sendButton.isEnabled = true
+            if let error = error {
+                print("send error:", error)
+                return
+            }
+            // Don't append locally; listener will deliver it.
+            self.inputTextView.text = ""
+            self.resizeTextViewIfNeeded()
+            self.updateSendState()
+
+            // After sending, we WANT to stick to bottom
+            self.scrollToBottom(animated: true)
+            self.didDoInitialScroll = true
         }
     }
 
+    // MARK: - Helpers
     private func scrollToBottom(animated: Bool) {
         let count = messages.count
         guard count > 0 else { return }
@@ -210,7 +341,6 @@ final class ChatViewController: UIViewController {
         tableView.scrollToRow(at: index, at: .bottom, animated: animated)
     }
 
-    // MARK: - Input helpers
     private func updateSendState() {
         let trimmed = inputTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
         let enabled = !trimmed.isEmpty
@@ -221,9 +351,14 @@ final class ChatViewController: UIViewController {
     private func resizeTextViewIfNeeded() {
         let fitting = CGSize(width: inputTextView.bounds.width, height: .greatestFiniteMagnitude)
         let target = inputTextView.sizeThatFits(fitting).height
-        let clamped = min(max(target, 56), 120) // grow between 56…120pt
+        let clamped = min(max(target, 56), 120)
+        let shouldStick = isNearBottom()
         inputTextViewHeight.constant = clamped
         view.layoutIfNeeded()
+        updateTableInsets()
+        if shouldStick, !messages.isEmpty {
+            scrollToBottom(animated: false)
+        }
     }
 }
 
@@ -255,6 +390,13 @@ extension ChatViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat { 66 }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { UITableView.automaticDimension }
+
+    // Track user interaction so we don’t fight their scroll
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { userIsInteracting = true }
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate { userIsInteracting = false }
+    }
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) { userIsInteracting = false }
 }
 
 // MARK: - UITextViewDelegate
@@ -264,7 +406,6 @@ extension ChatViewController: UITextViewDelegate {
         updateSendState()
     }
 
-    // Cmd+Return sends; Return inserts newline
     override var keyCommands: [UIKeyCommand]? {
         [UIKeyCommand(input: "\r", modifierFlags: [.command], action: #selector(onSendTapped), discoverabilityTitle: "Send")]
     }
@@ -332,14 +473,12 @@ fileprivate final class MessageCell: UITableViewCell {
         timeLabel.isHidden = !showTime
 
         if isMe {
-            // my bubble on the right
             leading.isActive = false
             trailing.isActive = true
             bubble.backgroundColor = UIColor.systemBlue
             label.textColor = .white
             timeLabel.textAlignment = .right
         } else {
-            // friend bubble on the left
             trailing.isActive = false
             leading.isActive = true
             bubble.backgroundColor = UIColor.secondarySystemBackground

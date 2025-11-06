@@ -116,8 +116,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let friend = usersList[indexPath.row]
-        let chatVC = ChatViewController(friend: friend)
-        chatVC.currentUser = self.currentUser
+
+        // Unwrap the signed-in user your VC tracks
+        guard let cu = self.currentUser else {
+            // Optional: show an alert that sign-in is required
+            return
+        }
+
+        // Push chat screen
+        let chatVC = ChatViewController(friend: friend, currentUser: cu)
         navigationController?.pushViewController(chatVC, animated: true)
     }
 }
